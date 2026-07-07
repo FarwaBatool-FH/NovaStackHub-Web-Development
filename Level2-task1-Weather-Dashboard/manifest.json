@@ -1,0 +1,17 @@
+{
+  "name": "Skyline — Live Weather",
+  "short_name": "Skyline",
+  "description": "A live, condition-aware weather app.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#10151f",
+  "theme_color": "#2E86FF",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
