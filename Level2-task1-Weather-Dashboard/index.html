@@ -1,67 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farwa Batool — Personal Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skyline — Live Weather</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#2E86FF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Light Effects Background -->
-    <div class="glow glow-1"></div>
-    <div class="glow glow-2"></div>
+<div class="sky" id="sky">
+  <div class="sky-fx" id="skyFx"></div>
+</div>
 
-    <div class="container">
-        <!-- Hero Section (Intro) -->
-        <header class="hero">
-            <div class="profile-badge">Frontend Developer</div>
-            <h1>Farwa Batool</h1>
-            <p class="subtitle">Software Engineering Student & Frontend Intern at NovaStack. Building clean, responsive web applications and dynamic user experiences.</p>
-        </header>
+<div class="app">
 
-        <!-- Projects Section (Yahan Cards Hain!) -->
-        <section class="projects-section">
-            <h2 class="section-title">My Projects</h2>
-            <div class="projects-grid">
+  <header class="topbar">
+    <form class="search" id="searchForm" autocomplete="off">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21L16.5 16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="text" id="cityInput" placeholder="Search a city…" />
+      <div class="suggestions" id="suggestions"></div>
+    </form>
+    <button class="locate-btn" id="locateBtn" title="Use my location" aria-label="Use my location">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2V5M12 19V22M2 12H5M19 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/></svg>
+    </button>
+    <button class="icon-btn" id="unitBtn" title="Toggle °C/°F" aria-label="Toggle temperature unit">°C</button>
+    <button class="icon-btn" id="themeBtn" title="Toggle light/dark UI" aria-label="Toggle theme">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none"><path d="M21 12.5A9 9 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </button>
+  </header>
 
-                <!-- Weather App Card -->
-                <div class="project-card featured">
-                    <div class="card-content">
-                        <span class="project-tag">Task 03 (Latest)</span>
-                        <h3>Skyline — Live Weather Dashboard</h3>
-                        <p>A condition-aware weather application featuring real-time geolocation tracking, dynamic background animations matching weather conditions, auto-suggestions search, and offline PWA capabilities.</p>
-                        <div class="card-buttons">
-                            <a href="https://github.com/FarwaBatool-FH/NovaStackHub-Web-Development" target="_blank" class="card-btn code-btn">View Code</a>
-                            <!-- Naya aur asli Netlify link yahan bilkul sahi lag gaya hai -->
-                            <a href="https://illustrious-mochi-e52607.netlify.app" target="_blank" class="card-btn live-btn">Live Demo ⚡</a>
-                        </div>
-                    </div>
-                </div>
+  <div class="favorites" id="favorites"></div>
 
-                <!-- Contact Form Card -->
-                <div class="project-card">
-                    <div class="card-content">
-                        <span class="project-tag">Task 01</span>
-                        <h3>Interactive Contact Form</h3>
-                        <p>A user-friendly contact form with client-side input validations, designed for seamless communication.</p>
-                        <div class="card-buttons">
-                            <a href="https://github.com/FarwaBatool-FH/NovaStackHub-Web-Development" target="_blank" class="card-btn code-btn">View Code</a>
-                        </div>
-                    </div>
-                </div>
+  <div class="status" id="status">Finding your sky…</div>
 
-            </div>
-        </section>
+  <main id="mainContent" class="main hidden">
 
-        <!-- Footer -->
-        <footer class="portfolio-footer">
-            <p>© 2026 Farwa Batool. Crafted for NovaStack Internship.</p>
-        </footer>
-    </div>
+    <section class="hero">
+      <div class="hero-icon" id="heroIcon"></div>
+      <div class="hero-temp">
+        <span id="temp">--</span><span class="deg">°</span>
+      </div>
+      <div class="hero-condition" id="condition">—</div>
+      <div class="hero-meta">
+        <span id="place">—</span>
+        <button class="fav-btn" id="favBtn" title="Save to favorites" aria-label="Save to favorites">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.6 6.2 6.7.5-5.1 4.4 1.6 6.5L12 17.3 6.2 20.6l1.6-6.5-5.1-4.4 6.7-.5L12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="dot">·</span>
+        <span id="dateTime">—</span>
+      </div>
+      <div class="hero-range">
+        <span>H: <b id="tempMax">--°</b></span>
+        <span>L: <b id="tempMin">--°</b></span>
+        <span>Feels like <b id="feelsLike">--°</b></span>
+      </div>
+    </section>
 
+    <section class="panel">
+      <h2 class="panel-title">Next 24 hours</h2>
+      <div class="hourly" id="hourly"></div>
+    </section>
+
+    <section class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <span class="stat-label">Humidity</span>
+        <span class="stat-value mono"><span id="humidity">--</span><small>%</small></span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Wind</span>
+        <span class="stat-value mono"><span id="wind">--</span><small>km/h</small></span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Pressure</span>
+        <span class="stat-value mono"><span id="pressure">--</span><small>hPa</small></span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">UV Index</span>
+        <span class="stat-value mono"><span id="uv">--</span></span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Visibility</span>
+        <span class="stat-value mono"><span id="visibility">--</span><small>km</small></span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Sunrise / Sunset</span>
+        <span class="stat-value mono small"><span id="sunrise">--</span> / <span id="sunset">--</span></span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">7-day forecast</h2>
+      <div class="daily" id="daily"></div>
+    </section>
+
+    <footer class="footer">
+      <span>Data from Open-Meteo</span>
+      <span id="lastUpdated"></span>
+    </footer>
+
+  </main>
+
+  <div class="error hidden" id="errorBox">
+    <p id="errorText"></p>
+    <button id="retryBtn">Try again</button>
+  </div>
+
+</div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
+  }
+</script>
+<script src="script.js"></script>
 </body>
 </html>
