@@ -411,6 +411,59 @@ body {
   margin: 0 0 12px 2px;
 }
 
+/* Outfit suggestion card */
+.outfit-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.outfit-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+.outfit-icon svg { width: 100%; height: 100%; }
+.outfit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.outfit-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+.outfit-suggestion {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* AQI card gets a colored left accent based on level */
+.aqi-card {
+  position: relative;
+  overflow: hidden;
+}
+.aqi-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--aqi-color, var(--accent));
+}
+#aqiLabel {
+  color: var(--aqi-color, var(--ink-faint)) !important;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
 .hourly {
   display: flex;
   gap: 10px;

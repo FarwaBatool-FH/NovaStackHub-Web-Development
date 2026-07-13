@@ -21,6 +21,7 @@
 
 <div class="app">
 
+  <!-- Search -->
   <header class="topbar">
     <form class="search" id="searchForm" autocomplete="off">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21L16.5 16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -36,10 +37,13 @@
     </button>
   </header>
 
+  <!-- Favorites -->
   <div class="favorites" id="favorites"></div>
 
+  <!-- Status -->
   <div class="status" id="status">Finding your sky…</div>
 
+  <!-- Main -->
   <main id="mainContent" class="main hidden">
 
     <section class="hero">
@@ -60,6 +64,16 @@
         <span>H: <b id="tempMax">--°</b></span>
         <span>L: <b id="tempMin">--°</b></span>
         <span>Feels like <b id="feelsLike">--°</b></span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="outfit-card" id="outfitCard">
+        <div class="outfit-icon" id="outfitIcon"></div>
+        <div class="outfit-text">
+          <span class="outfit-label">What to wear</span>
+          <span class="outfit-suggestion" id="outfitSuggestion">—</span>
+        </div>
       </div>
     </section>
 
@@ -92,6 +106,10 @@
       <div class="stat-card">
         <span class="stat-label">Sunrise / Sunset</span>
         <span class="stat-value mono small"><span id="sunrise">--</span> / <span id="sunset">--</span></span>
+      </div>
+      <div class="stat-card aqi-card" id="aqiCard">
+        <span class="stat-label">Air Quality</span>
+        <span class="stat-value mono"><span id="aqiValue">--</span><small id="aqiLabel"></small></span>
       </div>
     </section>
 

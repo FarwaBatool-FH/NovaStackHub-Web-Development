@@ -40,12 +40,18 @@ const els = {
   sunrise: document.getElementById('sunrise'),
   sunset: document.getElementById('sunset'),
   lastUpdated: document.getElementById('lastUpdated'),
+
+  outfitIcon: document.getElementById('outfitIcon'),
+  outfitSuggestion: document.getElementById('outfitSuggestion'),
+  aqiCard: document.getElementById('aqiCard'),
+  aqiValue: document.getElementById('aqiValue'),
+  aqiLabel: document.getElementById('aqiLabel'),
 };
 
 let lastCoords = null;
-let lastData = null;
-let unit = localStorage.getItem('skyline-unit') || 'metric';
-let theme = localStorage.getItem('skyline-theme') || 'dark';
+let lastData = null;      // most recent raw API response, kept for unit conversion without refetching
+let unit = localStorage.getItem('skyline-unit') || 'metric';   // 'metric' (°C, km/h) | 'imperial' (°F, mph)
+let theme = localStorage.getItem('skyline-theme') || 'dark';   // 'dark' | 'light' UI overlay
 let favorites = JSON.parse(localStorage.getItem('skyline-favorites') || '[]');
 
 /* ---------------- WMO weather code table ---------------- */
@@ -241,7 +247,7 @@ function fmtDay(iso) {
   return new Date(iso).toLocaleDateString([], { weekday: 'short' });
 }
 
-/* ---------------- Unit conversion ---------------- */
+/* ---------------- Unit conversion (feature: °C/°F, km/h/mph) ---------------- */
 function convertTemp(celsius) {
   return unit === 'imperial' ? (celsius * 9/5) + 32 : celsius;
 }
@@ -250,6 +256,100 @@ function convertSpeed(kmh) {
 }
 function tempUnitLabel() { return unit === 'imperial' ? '°F' : '°C'; }
 function speedUnitLabel() { return unit === 'imperial' ? 'mph' : 'km/h'; }
+
+/* ---------------- Feature: "What to wear" suggestion ---------------- */
+function outfitAdvice(celsius, group, windKmh) {
+  let text = '';
+  let iconType = 'shirt';
+
+  if (group === 'storm') {
+    text = 'Stay indoors if possible — thunderstorm expected.';
+    iconType = 'storm';
+  } else if (group === 'snow') {
+    text = 'Heavy coat, gloves, and boots — snow on the way.';
+    iconType = 'coat';
+  } else if (celsius <= 5) {
+    text = 'Bundle up — heavy jacket, scarf, and gloves recommended.';
+    iconType = 'coat';
+  } else if (celsius <= 12) {
+    text = 'A warm jacket or sweater is a good idea today.';
+    iconType = 'jacket';
+  } else if (celsius <= 20) {
+    if (group === 'rain' || group === 'drizzle') {
+      text = 'Light layers plus a raincoat or umbrella.';
+      iconType = 'umbrella';
+    } else {
+      text = 'Light layers work well — maybe a light jacket for the evening.';
+      iconType = 'jacket';
+    }
+  } else if (celsius <= 30) {
+    if (group === 'rain' || group === 'drizzle') {
+      text = 'T-shirt weather, but keep an umbrella handy.';
+      iconType = 'umbrella';
+    } else {
+      text = 'Comfortable T-shirt weather — nothing extra needed.';
+      iconType = 'shirt';
+    }
+  } else {
+    text = 'Very hot — light clothing, sunscreen, and stay hydrated.';
+    iconType = 'sun';
+  }
+
+  if (windKmh >= 30 && group !== 'storm') {
+    text += ' It\u2019s quite windy, so a windbreaker helps.';
+  }
+
+  return { text, iconType };
+}
+
+function outfitIconSvg(type) {
+  const stroke = `stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
+  switch (type) {
+    case 'coat':
+      return `<svg viewBox="0 0 48 48" ${stroke}><path d="M18 8l6 4 6-4 8 8-5 5v19H15V21l-5-5z"/><line x1="24" y1="12" x2="24" y2="34"/></svg>`;
+    case 'jacket':
+      return `<svg viewBox="0 0 48 48" ${stroke}><path d="M17 9l7 4 7-4 7 7-4 4v18H14V20l-4-4z"/></svg>`;
+    case 'umbrella':
+      return `<svg viewBox="0 0 48 48" ${stroke}><path d="M24 6c9 0 16 7 16 15H8c0-8 7-15 16-15z"/><line x1="24" y1="6" x2="24" y2="36"/><path d="M24 36a4 4 0 0 0 8 0"/></svg>`;
+    case 'sun':
+      return `<svg viewBox="0 0 48 48" ${stroke}><circle cx="24" cy="24" r="9"/><g>${[0,45,90,135,180,225,270,315].map(a=>`<line x1="24" y1="4" x2="24" y2="10" transform="rotate(${a} 12 12)"/>`).join('')}</g></svg>`;
+    case 'storm':
+      return `<svg viewBox="0 0 48 48" ${stroke}><path d="M25 8l-8 14h6l-5 12 14-16h-7l6-10z" fill="currentColor" stroke="none"/></svg>`;
+    default:
+      return `<svg viewBox="0 0 48 48" ${stroke}><path d="M16 8l8 3 8-3 6 6-4 4v20H14V18l-4-4z"/></svg>`;
+  }
+}
+
+/* ---------------- Feature: Air Quality Index ---------------- */
+async function fetchAirQuality(lat, lon) {
+  try {
+    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('AQI unavailable');
+    const data = await res.json();
+    renderAqi(data.current.us_aqi);
+  } catch {
+    els.aqiValue.textContent = '--';
+    els.aqiLabel.textContent = '';
+  }
+}
+
+function aqiInfo(value) {
+  if (value == null) return { label: '—', color: 'var(--ink-faint)' };
+  if (value <= 50)  return { label: 'Good', color: '#4ADE80' };
+  if (value <= 100) return { label: 'Moderate', color: '#FACC15' };
+  if (value <= 150) return { label: 'Unhealthy (SG)', color: '#FB923C' };
+  if (value <= 200) return { label: 'Unhealthy', color: '#F87171' };
+  if (value <= 300) return { label: 'Very Unhealthy', color: '#C084FC' };
+  return { label: 'Hazardous', color: '#7F1D1D' };
+}
+
+function renderAqi(value) {
+  const info = aqiInfo(value);
+  els.aqiValue.textContent = value != null ? Math.round(value) : '--';
+  els.aqiLabel.textContent = info.label;
+  els.aqiCard.style.setProperty('--aqi-color', info.color);
+}
 
 /* ---------------- Rendering ---------------- */
 function render(data, placeName) {
@@ -278,6 +378,11 @@ function render(data, placeName) {
   els.sunrise.textContent = fmtTime(data.daily.sunrise[0]);
   els.sunset.textContent = fmtTime(data.daily.sunset[0]);
 
+  const outfit = outfitAdvice(cur.temperature_2m, info.group, cur.wind_speed_10m);
+  els.outfitIcon.innerHTML = outfitIconSvg(outfit.iconType);
+  els.outfitSuggestion.textContent = outfit.text;
+
+  // Hourly — next 24h starting from current hour
   const nowIdx = data.hourly.time.findIndex(t => new Date(t) >= new Date(cur.time));
   const startIdx = nowIdx === -1 ? 0 : nowIdx;
   els.hourly.innerHTML = '';
@@ -294,6 +399,7 @@ function render(data, placeName) {
     els.hourly.appendChild(card);
   }
 
+  // Daily
   els.daily.innerHTML = '';
   for (let i = 0; i < data.daily.time.length; i++) {
     const dInfo = codeInfo(data.daily.weather_code[i]);
@@ -338,6 +444,7 @@ async function fetchWeather(lat, lon, placeName) {
     const data = await res.json();
     lastCoords = { lat, lon, placeName };
     render(data, placeName);
+    fetchAirQuality(lat, lon); 
   } catch (err) {
     showError('Could not load weather data. Check your connection and try again.');
   }
