@@ -1,16 +1,74 @@
-# React + Vite
+# 🛒 LVL3 E-Commerce Web App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern and responsive e-commerce website built with React, Vite, and Tailwind CSS. This project includes product listing, filtering, cart management, checkout flow, and order confirmation pages to simulate a real online shopping experience.
 
-Currently, two official plugins are available:
+## 🔗 GitHub Repository
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Repository: https://github.com/FarwaBatool-FH/NovaStackHub-Web-Development/tree/main/LVL3-e-commarance
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Responsive product listing page
+- Category-based filtering
+- Product search functionality
+- Product detail page with related products
+- Add to cart, update quantity, and remove items
+- Checkout form with order success page
+- Smooth loading experience and custom 404 page
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React.js
+- Vite
+- Tailwind CSS
+- React Router DOM
+- Context API
+- Local Storage for cart persistence
+
+## ▶️ Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Installation
+
+1. Clone the repository
+   ```bash
+   git clone https://github.com/FarwaBatool-FH/NovaStackHub-Web-Development.git
+   cd NovaStackHub-Web-Development/LVL3-e-commarance
+   ```
+
+2. Install dependencies
+   ```bash
+   npm install
+   ```
+
+3. Start the development server
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser at:
+   ```bash
+   http://localhost:5173
+   ```
+
+## 📁 Project Structure
+
+```bash
+src/
+├── components/
+├── context/
+├── data/
+├── pages/
+├── services/
+├── utils/
+├── App.jsx
+└── main.jsx
+```
+
+## 👩‍💻 Author
+
+Built by Farwa Batool as part of a web development internship project.
